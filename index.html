@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Gas Tracker 🟦</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'SF Mono', 'Monaco', monospace; 
+            background: #0a0a0f; 
+            color: #00ff88; 
+            min-height: 100vh; 
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { color: #0052ff; font-size: 28px; margin-bottom: 8px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .gas-display {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .gas-value { font-size: 48px; font-weight: bold; color: #00ff88; }
+        .gas-unit { font-size: 20px; color: #666; }
+        .gas-usd { font-size: 18px; color: #00fff5; margin-top: 10px; }
+        .label { color: #666; font-size: 14px; margin-bottom: 5px; }
+        .value { font-size: 24px; color: #fff; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: #1a1a2e; border-radius: 12px; padding: 20px; }
+        .card-label { color: #666; font-size: 12px; }
+        .card-value { color: #fff; font-size: 18px; margin-top: 5px; }
+        .update-time { color: #666; font-size: 12px; margin-top: 30px; text-align: center; }
+        .loading { color: #ffe600; }
+        .error { color: #ff2d63; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🟦 Base Gas Tracker</h1>
+        <p class="subtitle">Live gas prices on Base Network</p>
+        
+        <div class="gas-display">
+            <div class="label">Current Gas Price</div>
+            <div class="gas-value" id="gas">--</div>
+            <div class="gas-unit">Gwei</div>
+            <div class="gas-usd" id="gasUsd">~-- USD per transaction</div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-label">ETH Price</div>
+                <div class="card-value" id="ethPrice">--</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Last Update</div>
+                <div class="card-value" id="time">--</div>
+            </div>
+        </div>
+        
+        <div class="update-time" id="updated">Loading...</div>
+    </div>
+
+    <script>
+        async function fetchGas() {
+            try {
+                // Get gas price
+                const gasResponse = await fetch('https://mainnet.base.org', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        method: 'eth_gasPrice',
+                        params: [],
+                        id: 1
+                    })
+                });
+                const gasData = await gasResponse.json();
+                
+                // Get ETH price
+                const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+                const priceData = await priceResponse.json();
+                
+                const gasWei = parseInt(gasData.result, 16);
+                const gasGwei = gasWei / 1e9;
+                const ethPrice = priceData.ethereum.usd;
+                
+                // Calculate USD fee (21000 gas * gas price * ETH price)
+                const feeUsd = (gasGwei * 1e9 * 21000 / 1e18) * ethPrice;
+                
+                document.getElementById('gas').textContent = gasGwei.toFixed(4);
+                document.getElementById('gasUsd').textContent = '~$' + feeUsd.toFixed(4) + ' per tx';
+                document.getElementById('ethPrice').textContent = '$' + ethPrice.toLocaleString();
+                document.getElementById('time').textContent = new Date().toLocaleTimeString();
+                document.getElementById('updated').textContent = 'Updated: ' + new Date().toLocaleString();
+                
+            } catch (error) {
+                document.getElementById('updated').innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            }
+        }
+        
+        fetchGas();
+        setInterval(fetchGas, 30000); // Update every 30 seconds
+    </script>
+</body>
+</html>
