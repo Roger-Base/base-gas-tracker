@@ -35,6 +35,60 @@
         .update-time { color: #666; font-size: 12px; margin-top: 30px; text-align: center; }
         .loading { color: #ffe600; }
         .error { color: #ff2d63; }
+        .alert-section { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .alert-title { color: #fff; font-size: 16px; margin-bottom: 15px; }
+        .alert-input-group { display: flex; gap: 10px; }
+        .alert-input { 
+            flex: 1; 
+            padding: 12px; 
+            border: 1px solid #333; 
+            border-radius: 8px; 
+            background: #0a0a0f; 
+            color: #00ff88; 
+            font-size: 16px;
+            font-family: inherit;
+        }
+        .alert-btn {
+            padding: 12px 24px;
+            background: #0052ff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .alert-btn:hover { background: #0066ff; }
+        .alert-active { 
+            background: #1a3a2e; 
+            border: 1px solid #00ff88; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 15px;
+            display: none;
+        }
+        .alert-active.show { display: block; }
+        .alert-info { color: #00ff88; font-size: 14px; }
+        .alert-triggered { 
+            background: #3a1a2e; 
+            border: 1px solid #ff2d63; 
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .remove-alert { 
+            background: transparent; 
+            border: 1px solid #ff2d63; 
+            color: #ff2d63; 
+            padding: 5px 10px; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -61,9 +115,81 @@
         </div>
         
         <div class="update-time" id="updated">Loading...</div>
+        
+        <div class="alert-section">
+            <div class="alert-title">🔔 Gas Alert</div>
+            <div class="alert-input-group">
+                <input type="number" class="alert-input" id="targetGas" placeholder="Target gas (Gwei)" step="0.0001">
+                <button class="alert-btn" onclick="setAlert()">Set Alert</button>
+            </div>
+            <div class="alert-active" id="alertActive">
+                <div class="alert-info">Alert set: &lt; <span id="targetValue">--</span> Gwei</div>
+                <button class="remove-alert" onclick="removeAlert()">Remove</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        let currentGas = 0;
+        let alertTriggered = false;
+        
+        // Load saved alert on startup
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('gasAlert');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('targetGas').value = data.target;
+                showAlertState(data.target);
+            }
+        });
+        
+        function setAlert() {
+            const target = parseFloat(document.getElementById('targetGas').value);
+            if (!target || target <= 0) {
+                alert('Please enter a valid gas price');
+                return;
+            }
+            localStorage.setItem('gasAlert', JSON.stringify({ target: target, created: Date.now() }));
+            showAlertState(target);
+            checkAlert(currentGas);
+        }
+        
+        function removeAlert() {
+            localStorage.removeItem('gasAlert');
+            document.getElementById('alertActive').classList.remove('show', 'alert-triggered');
+            document.getElementById('targetGas').value = '';
+            alertTriggered = false;
+        }
+        
+        function showAlertState(target) {
+            document.getElementById('targetValue').textContent = target.toFixed(4);
+            document.getElementById('alertActive').classList.add('show');
+        }
+        
+        function checkAlert(gas) {
+            const saved = localStorage.getItem('gasAlert');
+            if (!saved) return;
+            
+            const data = JSON.parse(saved);
+            const target = data.target;
+            
+            if (gas < target && !alertTriggered) {
+                alertTriggered = true;
+                document.getElementById('alertActive').classList.add('alert-triggered');
+                // Browser notification
+                if (Notification.permission === 'granted') {
+                    new Notification('Gas Alert!', { 
+                        body: `Gas is now ${gas.toFixed(4)} Gwei (below ${target} Gwei)` 
+                    });
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission();
+                }
+            } else if (gas >= target) {
+                alertTriggered = false;
+                document.getElementById('alertActive').classList.remove('alert-triggered');
+            }
+        }
+        
         async function fetchGas() {
             try {
                 // Get gas price
@@ -85,6 +211,7 @@
                 
                 const gasWei = parseInt(gasData.result, 16);
                 const gasGwei = gasWei / 1e9;
+                currentGas = gasGwei; // Store for alert checking
                 const ethPrice = priceData.ethereum.usd;
                 
                 // Calculate USD fee (21000 gas * gas price * ETH price)
@@ -95,6 +222,9 @@
                 document.getElementById('ethPrice').textContent = '$' + ethPrice.toLocaleString();
                 document.getElementById('time').textContent = new Date().toLocaleTimeString();
                 document.getElementById('updated').textContent = 'Updated: ' + new Date().toLocaleString();
+                
+                // Check alert
+                checkAlert(gasGwei);
                 
             } catch (error) {
                 document.getElementById('updated').innerHTML = '<span class="error">Error: ' + error.message + '</span>';
