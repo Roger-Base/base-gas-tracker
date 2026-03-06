@@ -231,8 +231,22 @@
             }
         }
         
+        // Support / Donate section
+        function showDonate() {
+            const wallet = '0x42266e6012020f1dA7e87C047e12f0474B35B1F6';
+            const url = 'https://basescan.org/address/' + wallet + '#writecontract';
+            window.open(url, '_blank');
+        }
+        
         fetchGas();
         setInterval(fetchGas, 30000); // Update every 30 seconds
     </script>
+    <div style="text-align:center;margin-top:40px;padding:20px;border-top:1px solid #333;">
+        <p style="color:#666;margin-bottom:10px;">Support this service</p>
+        <a href="https://basescan.org/address/0x42266e6012020f1dA7e87C047e12f0474B35B1F6" target="_blank" 
+           style="background:#0052ff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;">
+            💰 Donate USDC on Base
+        </a>
+    </div>
 </body>
 </html>
