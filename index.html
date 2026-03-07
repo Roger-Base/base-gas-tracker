@@ -35,6 +35,13 @@
         .update-time { color: #666; font-size: 12px; margin-top: 30px; text-align: center; }
         .loading { color: #ffe600; }
         .error { color: #ff2d63; }
+        .history-section { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .history-title { color: #fff; font-size: 16px; margin-bottom: 15px; }
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-item { display: flex; justify-content: space-between; padding: 8px 12px; background: #0a0a0f; border-radius: 6px; font-size: 13px; }
+        .history-gas { color: #00ff88; }
+        .history-time { color: #666; }
+        .history-empty { color: #666; font-size: 14px; text-align: center; padding: 20px; }
         .alert-section { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; }
         .alert-title { color: #fff; font-size: 16px; margin-bottom: 15px; }
         .alert-input-group { display: flex; gap: 10px; }
@@ -116,6 +123,13 @@
         
         <div class="update-time" id="updated">Loading...</div>
         
+        <div class="history-section">
+            <div class="history-title">📊 Gas History</div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">Loading history...</div>
+            </div>
+        </div>
+        
         <div class="alert-section">
             <div class="alert-title">🔔 Gas Alert</div>
             <div class="alert-input-group">
@@ -132,6 +146,34 @@
     <script>
         let currentGas = 0;
         let alertTriggered = false;
+        
+        // Gas history functions
+        function updateHistory(gasGwei) {
+            const history = JSON.parse(localStorage.getItem('gasHistory') || '[]');
+            const now = new Date();
+            history.unshift({ gas: gasGwei, time: now.toLocaleTimeString() });
+            // Keep last 10 readings
+            const trimmed = history.slice(0, 10);
+            localStorage.setItem('gasHistory', JSON.stringify(trimmed));
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('gasHistory') || '[]');
+            const container = document.getElementById('historyList');
+            if (history.length === 0) {
+                container.innerHTML = '<div class="history-empty">No history yet</div>';
+                return;
+            }
+            container.innerHTML = history.map(item => 
+                '<div class="history-item"><span class="history-gas">' + item.gas.toFixed(4) + ' Gwei</span><span class="history-time">' + item.time + '</span></div>'
+            ).join('');
+        }
+        
+        // Load history on startup
+        window.addEventListener('load', () => {
+            renderHistory();
+            const saved = localStorage.getItem('gasAlert');
         
         // Load saved alert on startup
         window.addEventListener('load', () => {
@@ -225,6 +267,9 @@
                 
                 // Check alert
                 checkAlert(gasGwei);
+                
+                // Update history
+                updateHistory(gasGwei);
                 
             } catch (error) {
                 document.getElementById('updated').innerHTML = '<span class="error">Error: ' + error.message + '</span>';
