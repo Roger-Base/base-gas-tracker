@@ -35,7 +35,8 @@
         .update-time { color: #666; font-size: 12px; margin-top: 30px; text-align: center; }
         .loading { color: #ffe600; }
         .error { color: #ff2d63; }
-        .alert-section { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .alert-section { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; border: 2px solid #0052ff; }
+        .alert-badge { background: #0052ff; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 11px; margin-left: 10px; vertical-align: middle; }
         .alert-title { color: #fff; font-size: 16px; margin-bottom: 15px; }
         .alert-input-group { display: flex; gap: 10px; }
         .alert-input { 
@@ -94,7 +95,7 @@
 <body>
     <div class="container">
         <h1>🟦 Base Gas Tracker</h1>
-        <p class="subtitle">Live gas prices on Base Network</p>
+        <p class="subtitle">Real-time gas with builder alerts • Auto-updates every 30s</p>
         
         <div class="gas-display">
             <div class="label">Current Gas Price</div>
@@ -117,7 +118,7 @@
         <div class="update-time" id="updated">Loading...</div>
         
         <div class="alert-section">
-            <div class="alert-title">🔔 Gas Alert</div>
+            <div class="alert-title">🔔 Gas Alert <span class="alert-badge">BUILDER FEATURE</span></div>
             <div class="alert-input-group">
                 <input type="number" class="alert-input" id="targetGas" placeholder="Target gas (Gwei)" step="0.0001">
                 <button class="alert-btn" onclick="setAlert()">Set Alert</button>
@@ -126,6 +127,16 @@
                 <div class="alert-info">Alert set: &lt; <span id="targetValue">--</span> Gwei</div>
                 <button class="remove-alert" onclick="removeAlert()">Remove</button>
             </div>
+        </div>
+        
+        <div class="alert-section" style="border-color: #00ff88;">
+            <div class="alert-title" style="color: #00ff88;">💡 Builder Tips</div>
+            <ul style="color: #888; font-size: 13px; line-height: 1.8; margin-top: 10px; padding-left: 20px;">
+                <li>Gas spikes typically occur 9am-11am and 5pm-7pm ET</li>
+                <li>Batch multiple operations in a single transaction when possible</li>
+                <li>Use baseFee (not maxFee) as your benchmark for normal pricing</li>
+                <li>Set alerts for gas below 0.01 gwei to catch optimal windows</li>
+            </ul>
         </div>
     </div>
 
