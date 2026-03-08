@@ -3,504 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base Gas Tracker | Builder Edition</title>
+    <title>Base Gas Tracker v2 🟦</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; 
-            background: #0a0a0f; 
-            color: #e0e0e0; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
+            color: #fff;
             padding: 20px;
-            line-height: 1.5;
         }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        /* Header */
-        header { 
-            text-align: center; 
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #1a1a2e;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        h1 { 
-            color: #0052ff; 
-            font-size: 1.6rem; 
-            margin-bottom: 8px;
-        }
-        .tagline { 
-            color: #666; 
-            font-size: 0.85rem;
-        }
-        
-        /* Gas Display Card */
-        .gas-card { 
-            background: #12121a; 
-            border-radius: 16px; 
-            padding: 24px;
-            border: 1px solid #252535;
-            margin-bottom: 20px;
-        }
-        .gas-main { 
+        header {
             text-align: center;
-            padding: 20px 0;
+            margin-bottom: 30px;
         }
-        .gas-value { 
-            font-size: 3rem; 
-            font-weight: bold;
-            color: #00ff88;
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #0052ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .gas-unit { 
-            font-size: 1rem; 
-            color: #666;
-            margin-left: 8px;
+        .subtitle {
+            color: #8b9dc3;
+            font-size: 1rem;
         }
-        
-        /* Status Badge */
-        .status-badge {
+        .badge {
             display: inline-block;
+            background: #0052ff;
+            color: white;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
-            margin-top: 10px;
-            font-weight: 500;
+            margin-left: 10px;
+            vertical-align: middle;
         }
-        .status-low { background: #1a3d1a; color: #4ade80; }
-        .status-med { background: #3d3d1a; color: #facc15; }
-        .status-high { background: #3d1a1a; color: #f87171; }
-        
-        /* Price Grid */
-        .price-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #252535;
-        }
-        .price-item {
-            background: #0a0a0f;
-            padding: 12px;
-            border-radius: 8px;
-        }
-        .price-label { 
-            font-size: 0.7rem; 
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .price-value { 
-            font-size: 1.1rem; 
-            color: #00fff5;
-            margin-top: 4px;
-        }
-        
-        /* Optimization Section */
-        .opt-section {
-            background: #12121a;
+        .card {
+            background: rgba(255,255,255,0.05);
             border-radius: 16px;
             padding: 24px;
-            border: 1px solid #252535;
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .opt-header {
-            display: flex;
+        .gas-display {
+            text-align: center;
+            padding: 30px 0;
+        }
+        .gas-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        .gas-unit {
+            font-size: 1.5rem;
+            color: #8b9dc3;
+        }
+        .gas-label {
+            color: #8b9dc3;
+            margin-top: 8px;
+        }
+        .trend {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
         }
-        .opt-icon { font-size: 1.4rem; }
-        .opt-title {
-            font-size: 1rem;
-            color: #a78bfa;
+        .trend.up {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
         }
-        .opt-recommendation {
-            background: #0a0a0f;
-            padding: 16px;
-            border-radius: 10px;
-            border-left: 3px solid #a78bfa;
+        .trend.down {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
         }
-        .opt-label {
-            font-size: 0.7rem;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 6px;
+        .trend.stable {
+            background: rgba(255, 255, 255, 0.1);
+            color: #8b9dc3;
         }
-        .opt-value {
-            font-size: 1rem;
-            color: #e0e0e0;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
         }
-        .opt-savings {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #252535;
-            font-size: 0.85rem;
-            color: #4ade80;
-        }
-        
-        /* Gas Tips */
-        .tips-section {
-            background: #12121a;
-            border-radius: 16px;
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
             padding: 20px;
-            border: 1px solid #252535;
-            margin-bottom: 20px;
+            text-align: center;
         }
-        .tips-title {
+        .stat-label {
+            color: #8b9dc3;
             font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
-        .tip {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid #1a1a2e;
-            font-size: 0.85rem;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
         }
-        .tip:last-child { border-bottom: none; }
-        .tip-icon { color: #00ff88; }
-        
-        /* Alert Section */
+        .stat-value.gas { color: #00d4ff; }
+        .stat-value.eth { color: #627eea; }
+        .stat-value.block { color: #00ff88; }
+        .recommendation {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .recommendation.good {
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+        }
+        .recommendation.wait {
+            background: rgba(255, 193, 7, 0.15);
+            border: 2px solid #ffc107;
+            color: #ffc107;
+        }
+        .recommendation.bad {
+            background: rgba(255, 107, 107, 0.15);
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+        }
         .alert-section {
-            background: #12121a;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #252535;
-        }
-        .alert-header {
             display: flex;
-            justify-content: space-between;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
             align-items: center;
-            margin-bottom: 16px;
-        }
-        .alert-title {
-            font-size: 1rem;
-            color: #fbbf24;
-        }
-        .alert-input-group {
-            display: flex;
-            gap: 10px;
         }
         .alert-input {
-            flex: 1;
-            background: #0a0a0f;
-            border: 1px solid #252535;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 8px;
-            padding: 10px 14px;
-            color: #e0e0e0;
-            font-family: inherit;
-            font-size: 0.9rem;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 1rem;
+            width: 180px;
         }
-        .alert-input:focus {
-            outline: none;
-            border-color: #0052ff;
+        .alert-input::placeholder {
+            color: #8b9dc3;
         }
         .alert-btn {
             background: #0052ff;
-            color: #fff;
+            color: white;
             border: none;
             border-radius: 8px;
-            padding: 10px 20px;
+            padding: 12px 24px;
+            font-size: 1rem;
             cursor: pointer;
-            font-family: inherit;
-            font-size: 0.85rem;
             transition: background 0.2s;
         }
-        .alert-btn:hover { background: #0039b3; }
-        
+        .alert-btn:hover {
+            background: #0066ff;
+        }
+        .alert-btn.remove {
+            background: rgba(255,107,107,0.3);
+        }
+        .alert-btn.remove:hover {
+            background: rgba(255,107,107,0.5);
+        }
         .alert-status {
-            margin-top: 12px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            display: none;
-        }
-        .alert-active {
-            background: #1a3d2e;
-            color: #4ade80;
-            display: block;
-        }
-        
-        /* Footer */
-        footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #1a1a2e;
+            margin-top: 12px;
+            color: #8b9dc3;
+            font-size: 0.9rem;
         }
-        .footer-link {
-            color: #666;
-            font-size: 0.8rem;
-            text-decoration: none;
+        .history-chart {
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 20px 0;
         }
-        .footer-link:hover { color: #0052ff; }
-        
-        .update-time {
-            color: #444;
-            font-size: 0.75rem;
-            margin-top: 10px;
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #0052ff, #00d4ff);
+            border-radius: 4px 4px 0 0;
+            min-height: 10px;
+            transition: height 0.3s;
         }
-        
-        @media (max-width: 480px) {
-            .price-grid { grid-template-columns: 1fr; }
-            .gas-value { font-size: 2.2rem; }
+        .last-updated {
+            text-align: center;
+            color: #8b9dc3;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        .operator-tip {
+            background: rgba(0, 82, 255, 0.1);
+            border-left: 4px solid #0052ff;
+            padding: 16px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        .operator-tip h4 {
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+        .operator-tip p {
+            color: #8b9dc3;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .gas-value { font-size: 3rem; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>⛽ Base Gas Tracker</h1>
-            <p class="tagline">Builder-optimized gas insights for Base</p>
+            <h1>Base Gas Tracker <span class="badge">v2</span></h1>
+            <p class="subtitle">Real-time gas for Base builders & operators</p>
         </header>
-        
-        <!-- Main Gas Display -->
-        <div class="gas-card">
-            <div class="gas-main">
-                <div class="gas-value" id="gasValue">--</div>
-                <span class="gas-unit">gwei</span>
-                <div class="status-badge" id="statusBadge">Loading...</div>
-            </div>
-            
-            <div class="price-grid">
-                <div class="price-item">
-                    <div class="price-label">ETH Price</div>
-                    <div class="price-value" id="ethPrice">--</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-label">Fast Tx Cost</div>
-                    <div class="price-value" id="fastTx">--</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-label">Transfer (21k)</div>
-                    <div class="price-value" id="transfer21k">--</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-label">Contract (100k)</div>
-                    <div class="price-value" id="contract100k">--</div>
+
+        <div class="card">
+            <div class="gas-display">
+                <div class="gas-value"><span id="gasPrice">--</span> <span class="gas-unit">Gwei</span></div>
+                <div class="gas-label">Current Gas Price</div>
+                <div id="trend" class="trend stable">
+                    <span>●</span> <span>Loading...</span>
                 </div>
             </div>
         </div>
-        
-        <!-- Optimization Recommendation -->
-        <div class="opt-section">
-            <div class="opt-header">
-                <span class="opt-icon">🎯</span>
-                <span class="opt-title">Optimization Recommendation</span>
-            </div>
-            <div class="opt-recommendation">
-                <div class="opt-label">Current Best Strategy</div>
-                <div class="opt-value" id="optStrategy">Loading...</div>
-                <div class="opt-savings" id="optSavings">--</div>
+
+        <div class="card">
+            <div id="recommendation" class="recommendation wait">
+                ⏳ Analyzing gas conditions...
             </div>
         </div>
-        
-        <!-- Gas Tips -->
-        <div class="tips-section">
-            <div class="tips-title">💡 Builder Tips</div>
-            <div class="tip">
-                <span class="tip-icon">●</span>
-                <span>Gas spikes typically occur 9am-11am and 5pm-7pm ET</span>
-            </div>
-            <div class="tip">
-                <span class="tip-icon">●</span>
-                <span>Batch multiple operations in a single transaction when possible</span>
-            </div>
-            <div class="tip">
-                <span class="tip-icon">●</span>
-                <span>Use baseFee (not maxFee) as your benchmark for normal pricing</span>
-            </div>
-            <div class="tip">
-                <span class="tip-icon">●</span>
-                <span>Set alerts for gas below 0.01 gwei to catch optimal windows</span>
+
+        <div class="card">
+            <div class="grid">
+                <div class="stat-card">
+                    <div class="stat-label">ETH Price</div>
+                    <div class="stat-value eth" id="ethPrice">$--,---</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Latest Block</div>
+                    <div class="stat-value block" id="blockNumber">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Gas Trend (10m)</div>
+                    <div class="stat-value gas" id="gasTrend">--</div>
+                </div>
             </div>
         </div>
-        
-        <!-- Alert Section -->
-        <div class="alert-section">
-            <div class="alert-header">
-                <span class="alert-title">🔔 Gas Alert</span>
-            </div>
-            <div class="alert-input-group">
-                <input type="number" class="alert-input" id="targetGas" 
-                       placeholder="Target gas (gwei)" step="0.001" value="0.001">
+
+        <div class="card">
+            <h3 style="margin-bottom: 16px; color: #8b9dc3;">📈 Gas History (Last 10 Reads)</h3>
+            <div class="history-chart" id="historyChart"></div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 16px; color: #8b9dc3;">🔔 Gas Alert</h3>
+            <div class="alert-section">
+                <input type="number" class="alert-input" id="targetGas" placeholder="Target gas (Gwei)" step="0.0001">
                 <button class="alert-btn" onclick="setAlert()">Set Alert</button>
+                <button class="alert-btn remove" onclick="removeAlert()">Remove</button>
             </div>
             <div class="alert-status" id="alertStatus"></div>
         </div>
-        
-        <footer>
-            <a href="https://basescan.org/address/0x42266e6012020f1dA7e87C047e12f0474B35B1F6" 
-               target="_blank" class="footer-link">Support: 0x4226...B35B</a>
-            <div class="update-time">Updated: <span id="updateTime">--</span></div>
-        </footer>
+
+        <div class="operator-tip">
+            <h4>🛠️ For Operators</h4>
+            <p>Gas spikes can erode profits on automated trades. Set alerts below 0.02 Gwei for deployment-ready conditions. Track the trend - if gas is rising, wait before confirming large transfers.</p>
+        </div>
+
+        <div class="last-updated">
+            Last updated: <span id="lastUpdated">--</span>
+        </div>
     </div>
 
     <script>
-        const BASE_RPC = 'https://mainnet.base.org';
-        let currentGasGwei = 0;
-        let alertInterval = null;
+        const GAS_API = 'https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourApiKeyToken';
+        const ETH_API = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
         
-        // Get gas price from Base
-        async function fetchGas() {
-            try {
-                const gasRes = await fetch(BASE_RPC, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        method: 'eth_gasPrice',
-                        params: [],
-                        id: 1
-                    })
-                });
-                const gasData = await gasRes.json();
-                const gasWei = parseInt(gasData.result, 16);
-                currentGasGwei = gasWei / 1e9;
-                
-                // Get block info for better estimates
-                let blockData = null;
-                try {
-                    const blockRes = await fetch(BASE_RPC, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            jsonrpc: '2.0',
-                            method: 'eth_getBlockByNumber',
-                            params: ['latest', false],
-                            id: 2
-                        })
-                    });
-                    blockData = await blockRes.json();
-                } catch(e) {}
-                
-                // Get ETH price
-                let ethPrice = 0;
-                try {
-                    const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-                    const priceData = await priceRes.json();
-                    ethPrice = priceData.ethereum.usd;
-                } catch(e) {
-                    const cbRes = await fetch('https://api.coinbase.com/v2/prices/ETH-USD/spot');
-                    const cbData = await cbRes.json();
-                    ethPrice = parseFloat(cbData.data.amount);
-                }
-                
-                // Calculate fees
-                const fastFee = (currentGasGwei * 1e9 * 21000 / 1e18) * ethPrice;
-                const transferFee = (currentGasGwei * 1e9 * 21000 / 1e18) * ethPrice;
-                const contractFee = (currentGasGwei * 1e9 * 100000 / 1e18) * ethPrice;
-                
-                // Update UI
-                document.getElementById('gasValue').textContent = currentGasGwei.toFixed(4);
-                document.getElementById('ethPrice').textContent = '$' + ethPrice.toFixed(2);
-                document.getElementById('fastTx').textContent = '$' + fastFee.toFixed(2);
-                document.getElementById('transfer21k').textContent = '$' + transferFee.toFixed(2);
-                document.getElementById('contract100k').textContent = '$' + contractFee.toFixed(2);
-                
-                // Status badge
-                const badge = document.getElementById('statusBadge');
-                if (currentGasGwei < 0.01) {
-                    badge.textContent = '● Low';
-                    badge.className = 'status-badge status-low';
-                } else if (currentGasGwei < 0.1) {
-                    badge.textContent = '● Moderate';
-                    badge.className = 'status-badge status-med';
-                } else {
-                    badge.textContent = '● High';
-                    badge.className = 'status-badge status-high';
-                }
-                
-                // Generate optimization recommendation
-                updateRecommendation(currentGasGwei, ethPrice);
-                
-                // Check alert
-                checkAlert();
-                
-                document.getElementById('updateTime').textContent = new Date().toLocaleString();
-                
-            } catch(error) {
-                console.error('Gas fetch error:', error);
-                document.getElementById('gasValue').textContent = 'Error';
-                document.getElementById('statusBadge').textContent = 'API Error';
-                document.getElementById('statusBadge').className = 'status-badge status-high';
+        let gasHistory = [];
+        let currentGas = 0;
+        let alertTarget = null;
+        
+        // Load saved alert
+        function loadAlert() {
+            const saved = localStorage.getItem('baseGasAlert');
+            if (saved) {
+                const data = JSON.parse(saved);
+                alertTarget = data.target;
+                document.getElementById('targetGas').value = data.target;
+                document.getElementById('alertStatus').textContent = `Alert set for ${data.target} Gwei`;
             }
         }
         
-        // Update optimization recommendation
-        function updateRecommendation(gasGwei, ethPrice) {
-            const strategyEl = document.getElementById('optStrategy');
-            const savingsEl = document.getElementById('optSavings');
-            
-            let strategy = '';
-            let savings = '';
-            
-            if (gasGwei < 0.005) {
-                strategy = '✅ Excellent window for non-urgent transactions. Batch operations now.';
-                const savingsVsHigh = ((0.1 - gasGwei) * 21000 / 1e18) * ethPrice;
-                savings = `Potential savings vs high gas: ~$${savingsVsHigh.toFixed(2)} per 21k gas`;
-            } else if (gasGwei < 0.02) {
-                strategy = '📊 Good pricing for standard transactions.';
-                const savingsVsHigh = ((0.1 - gasGwei) * 21000 / 1e18) * ethPrice;
-                savings = `Potential savings vs high gas: ~$${savingsVsHigh.toFixed(2)} per 21k gas`;
-            } else if (gasGwei < 0.1) {
-                strategy = '⚠️ Moderate gas. Consider waiting 15-30 min if not urgent.';
-            } else {
-                strategy = '🚫 High gas. Delay non-essential transactions if possible.';
-            }
-            
-            strategyEl.textContent = strategy;
-            savingsEl.textContent = savings;
-        }
-        
-        // Alert functions
         function setAlert() {
-            const target = document.getElementById('targetGas').value;
-            if (!target) return;
+            const target = parseFloat(document.getElementById('targetGas').value);
+            if (isNaN(target) || target <= 0) {
+                alert('Please enter a valid gas price');
+                return;
+            }
+            alertTarget = target;
+            localStorage.setItem('baseGasAlert', JSON.stringify({ target: target }));
+            document.getElementById('alertStatus').textContent = `Alert set for ${target} Gwei`;
             
-            localStorage.setItem('gasAlertTarget', target);
-            localStorage.setItem('gasAlertSet', 'true');
-            
-            const statusEl = document.getElementById('alertStatus');
-            statusEl.textContent = `✓ Alert set for ${target} gwei`;
-            statusEl.className = 'alert-status alert-active';
-            
-            if (!alertInterval) {
-                alertInterval = setInterval(checkAlert, 30000);
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission();
             }
         }
         
-        function checkAlert() {
-            const target = parseFloat(localStorage.getItem('gasAlertTarget'));
-            const isSet = localStorage.getItem('gasAlertSet') === 'true';
-            
-            if (!isSet || !target) return;
-            
-            if (currentGasGwei <= target && currentGasGwei > 0) {
+        function removeAlert() {
+            alertTarget = null;
+            localStorage.removeItem('baseGasAlert');
+            document.getElementById('targetGas').value = '';
+            document.getElementById('alertStatus').textContent = '';
+        }
+        
+        function checkAlert(gas) {
+            if (alertTarget && gas <= alertTarget) {
                 if (Notification.permission === 'granted') {
                     new Notification('Gas Alert! 🎉', {
-                        body: `Gas is now ${currentGasGwei.toFixed(4)} gwei - below your target of ${target} gwei!`,
-                        icon: '⛽'
+                        body: `Gas is now ${gas} Gwei (target: ${alertTarget} Gwei)`,
+                        icon: '🟦'
                     });
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission();
                 }
-                
-                // Also play a sound
-                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp6Vh3hwZWRqeIeSnpeQgHBjXF1sfIaSnpeRgW9kX2NofIKRno');
-                audio.play().catch(() => {});
             }
         }
         
-        // Initial load
-        fetchGas();
+        async function fetchGas() {
+            try {
+                const response = await fetch(GAS_API);
+                const data = await response.json();
+                if (data.status === '1') {
+                    return parseFloat(data.result.SafeGasPrice);
+                }
+            } catch (e) {
+                console.error('Gas fetch error:', e);
+            }
+            return null;
+        }
         
-        // Refresh every 30 seconds
-        setInterval(fetchGas, 30000);
+        async function fetchEthPrice() {
+            try {
+                const response = await fetch(ETH_API);
+                const data = await response.json();
+                return data.ethereum?.usd || null;
+            } catch (e) {
+                console.error('ETH price error:', e);
+            }
+            return null;
+        }
+        
+        async function fetchBlock() {
+            try {
+                const response = await fetch('https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=YourApiKeyToken');
+                const data = await response.json();
+                if (data.result) {
+                    return parseInt(data.result, 16);
+                }
+            } catch (e) {
+                console.error('Block fetch error:', e);
+            }
+            return null;
+        }
+        
+        function updateTrend(history) {
+            if (history.length < 2) return 'stable';
+            const recent = history.slice(-3).reduce((a, b) => a + b, 0) / Math.min(history.length, 3);
+            const older = history.slice(0, 3).reduce((a, b) => a + b, 0) / Math.min(history.length, 3);
+            if (recent < older * 0.9) return 'down';
+            if (recent > older * 1.1) return 'up';
+            return 'stable';
+        }
+        
+        function getRecommendation(gas) {
+            if (gas < 0.02) {
+                return { class: 'good', text: '✅ Great for deployments & large transfers' };
+            } else if (gas < 0.05) {
+                return { class: 'good', text: '✅ Good for most transactions' };
+            } else if (gas < 0.1) {
+                return { class: 'wait', text: '⚠️ Wait if not urgent' };
+            } else {
+                return { class: 'bad', text: '❌ Defer non-essential transactions' };
+            }
+        }
+        
+        async function update() {
+            const gas = await fetchGas();
+            const eth = await fetchEthPrice();
+            const block = await fetchBlock();
+            
+            if (gas !== null) {
+                currentGas = gas;
+                document.getElementById('gasPrice').textContent = gas.toFixed(4);
+                
+                gasHistory.push(gas);
+                if (gasHistory.length > 10) gasHistory.shift();
+                
+                // Update trend
+                const trend = updateTrend(gasHistory);
+                const trendEl = document.getElementById('trend');
+                trendEl.className = `trend ${trend}`;
+                trendEl.innerHTML = trend === 'up' ? '↑ Gas rising' : trend === 'down' ? '↓ Gas falling' : '→ Gas stable';
+                
+                // Update recommendation
+                const rec = getRecommendation(gas);
+                const recEl = document.getElementById('recommendation');
+                recEl.className = `recommendation ${rec.class}`;
+                recEl.textContent = rec.text;
+                
+                // Update history chart
+                const chart = document.getElementById('historyChart');
+                const maxGas = Math.max(...gasHistory, 0.1);
+                chart.innerHTML = gasHistory.map(g => 
+                    `<div class="chart-bar" style="height: ${(g / maxGas) * 100}%"></div>`
+                ).join('');
+                
+                // Check alert
+                checkAlert(gas);
+            }
+            
+            if (eth) {
+                document.getElementById('ethPrice').textContent = '$' + eth.toLocaleString();
+            }
+            
+            if (block) {
+                document.getElementById('blockNumber').textContent = block.toLocaleString();
+            }
+            
+            if (gasHistory.length > 0) {
+                const avg = gasHistory.reduce((a, b) => a + b, 0) / gasHistory.length;
+                document.getElementById('gasTrend').textContent = avg.toFixed(3) + ' avg';
+            }
+            
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        }
+        
+        // Initialize
+        loadAlert();
+        update();
+        setInterval(update, 30000);
     </script>
 </body>
 </html>
